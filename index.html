@@ -704,6 +704,39 @@
 
         let notices = [];
 
+        // LocalStorage keys
+        const READ_NOTICES_KEY = 'readNotices';
+
+        // Get read notices from localStorage
+        function getReadNotices() {
+            const stored = localStorage.getItem(READ_NOTICES_KEY);
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        // Mark notice as read
+        function markAsRead(noticeId) {
+            const readNotices = getReadNotices();
+            const noticeKey = `${notices[noticeId].title}_${notices[noticeId].date}`;
+
+            if (!readNotices.includes(noticeKey)) {
+                readNotices.push(noticeKey);
+                localStorage.setItem(READ_NOTICES_KEY, JSON.stringify(readNotices));
+                updateNoticeBadge();
+            }
+        }
+
+        // Check if notice is read
+        function isNoticeRead(notice) {
+            const readNotices = getReadNotices();
+            const noticeKey = `${notice.title}_${notice.date}`;
+            return readNotices.includes(noticeKey);
+        }
+
+        // Get unread count
+        function getUnreadCount() {
+            return notices.filter(notice => !isNoticeRead(notice)).length;
+        }
+
         // Fetch notices from Google Sheets
         async function loadNoticesFromGoogleSheets() {
             try {
@@ -766,9 +799,9 @@
         // Update notice badge
         function updateNoticeBadge() {
             const badge = document.getElementById('noticeBadge');
-            const count = notices.length;
-            badge.textContent = count;
-            badge.style.display = count > 0 ? 'flex' : 'none';
+            const unreadCount = getUnreadCount();
+            badge.textContent = unreadCount;
+            badge.style.display = unreadCount > 0 ? 'flex' : 'none';
         }
 
         // Panel controls
@@ -803,6 +836,9 @@
             const notice = notices[noticeId];
 
             if (!notice) return;
+
+            // Mark as read
+            markAsRead(noticeId);
 
             document.getElementById('detailTitle').textContent = notice.title;
             document.getElementById('detailDate').textContent = notice.date;
