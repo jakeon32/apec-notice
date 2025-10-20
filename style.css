@@ -73,28 +73,43 @@ body {
     border-radius: 12px;
 }
 
+/* Banner Controls - 네비게이션 + 닫기 그룹 */
+.banner-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.banner-nav-group {
+    display: flex;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 2px;
+    border-radius: 6px;
+}
+
 .banner-nav-btn {
     background: rgba(255, 255, 255, 0.2);
     border: none;
     color: white;
-    font-size: 24px;
+    font-size: 20px;
     cursor: pointer;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 4px;
     transition: all 0.2s;
-    margin: 0 4px;
 }
 
 .banner-nav-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.4);
 }
 
 .banner-nav-btn:disabled {
     cursor: not-allowed;
+    opacity: 0.3;
 }
 
 .dynamic-banner-close {
@@ -864,10 +879,14 @@ footer p {
         font-size: 13px;
     }
 
+    .banner-controls {
+        gap: 8px;
+    }
+
     .banner-nav-btn {
-        font-size: 20px;
-        width: 28px;
-        height: 28px;
+        font-size: 18px;
+        width: 24px;
+        height: 24px;
     }
 
     .modal-nav-btn {

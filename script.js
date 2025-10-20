@@ -338,18 +338,22 @@ function showBannerCarousel() {
 
     // 배너 내용
     banner.innerHTML = `
-        <button class="banner-nav-btn banner-prev" onclick="navigateBanner(-1)" ${bannerNotices.length <= 1 ? 'style="display:none"' : ''}>
-            ‹
-        </button>
         <div class="dynamic-banner-content" onclick="openBannerDetail(${notice.id})" style="cursor: pointer;">
             <span class="dynamic-banner-icon">${notice.tag === 'urgent' ? '⚠️' : 'ℹ️'}</span>
             <span class="dynamic-banner-text">${notice.title}</span>
             <span class="banner-indicator" ${bannerNotices.length <= 1 ? 'style="display:none"' : ''}>${currentBannerIndex + 1}/${bannerNotices.length}</span>
         </div>
-        <button class="banner-nav-btn banner-next" onclick="navigateBanner(1)" ${bannerNotices.length <= 1 ? 'style="display:none"' : ''}>
-            ›
-        </button>
-        <button class="dynamic-banner-close" onclick="closeBanner(event)" aria-label="Close">&times;</button>
+        <div class="banner-controls">
+            <div class="banner-nav-group" ${bannerNotices.length <= 1 ? 'style="display:none"' : ''}>
+                <button class="banner-nav-btn banner-prev" onclick="navigateBanner(-1)">
+                    ‹
+                </button>
+                <button class="banner-nav-btn banner-next" onclick="navigateBanner(1)">
+                    ›
+                </button>
+            </div>
+            <button class="dynamic-banner-close" onclick="closeBanner(event)" aria-label="Close">&times;</button>
+        </div>
     `;
     banner.classList.add('active');
 
