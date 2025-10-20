@@ -174,8 +174,9 @@ function viewFullDetails() {
     closeAlertModal();
     openNoticePanel();
     setTimeout(() => {
-        if (notices.length > 0) {
-            showNoticeDetail(0);
+        if (modalNotices.length > 0) {
+            const currentNotice = modalNotices[currentModalIndex];
+            showNoticeDetail(currentNotice.id);
         }
     }, 100);
 }
@@ -242,6 +243,7 @@ function handleSpecialNotices() {
 // Show modal carousel
 function showModalCarousel() {
     const notice = modalNotices[currentModalIndex];
+    console.log('🔔 Showing modal:', currentModalIndex + 1, '/', modalNotices.length, notice.title);
 
     // 모달 내용 업데이트
     document.getElementById('alertModal').querySelector('.alert-modal-title').textContent = notice.title;
@@ -330,6 +332,7 @@ function closeCurrentModal() {
 // Show banner carousel
 function showBannerCarousel() {
     const notice = bannerNotices[currentBannerIndex];
+    console.log('📢 Showing banner:', currentBannerIndex + 1, '/', bannerNotices.length, notice.title);
 
     // 배너가 없으면 생성
     let banner = document.getElementById('dynamicBanner');
