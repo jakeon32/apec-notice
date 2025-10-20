@@ -7,13 +7,49 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Alert Banner -->
-    <div class="alert-banner" id="alertBanner">
-        <div class="alert-banner-content" onclick="openAlertDetail()" style="cursor: pointer;">
-            <span class="alert-icon">⚠️</span>
-            <span class="alert-text">Traffic Control During Summit Period (Nov 15-17, 2025) - Click for details</span>
+    <!-- Alert Modal Overlay -->
+    <div class="alert-modal-overlay" id="alertModalOverlay" onclick="closeAlertModal()"></div>
+
+    <!-- Alert Modal -->
+    <div class="alert-modal" id="alertModal">
+        <div class="alert-modal-header">
+            <div class="alert-modal-icon">⚠️</div>
+            <button class="alert-modal-close" onclick="closeCurrentModal()" aria-label="Close">&times;</button>
         </div>
-        <button class="alert-close" onclick="closeAlert(event)" aria-label="Close">&times;</button>
+        <div class="alert-modal-content">
+            <div class="modal-content-wrapper" id="modalContentWrapper">
+                <h2 class="alert-modal-title">Traffic Control During Summit Period</h2>
+                <p class="alert-modal-subtitle">November 15-17, 2025</p>
+
+                <!-- Navigation with Page Indicator -->
+                <div class="modal-nav-container">
+                    <button class="modal-nav-btn modal-prev" id="modalPrevBtn" onclick="navigateModal(-1)" aria-label="Previous">
+                        ‹
+                    </button>
+                    <div class="modal-indicator" id="modalIndicator">1 / 1</div>
+                    <button class="modal-nav-btn modal-next" id="modalNextBtn" onclick="navigateModal(1)" aria-label="Next">
+                        ›
+                    </button>
+                </div>
+
+                <div class="alert-modal-body">
+                    <p>During the APEC 2025 Summit, special traffic control measures will be in effect in the Gyeongju area.</p>
+                    <ul>
+                        <li>Road closures near major venues</li>
+                        <li>Enhanced security checkpoints</li>
+                        <li>Alternative routes recommended</li>
+                        <li>Use public transportation when possible</li>
+                    </ul>
+                </div>
+            </div>
+            <button class="alert-modal-btn" onclick="viewFullDetails()">View Full Details</button>
+            <div class="alert-modal-footer">
+                <label class="alert-checkbox">
+                    <input type="checkbox" id="dontShowAgain" onchange="handleDontShowAgain(this)">
+                    <span>Don't show this again for 24 hours</span>
+                </label>
+            </div>
+        </div>
     </div>
 
     <!-- Header -->
