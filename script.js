@@ -192,20 +192,34 @@ function handleDontShowAgain(checkbox) {
 
 // Handle special notices (modal, banner)
 function handleSpecialNotices() {
+    console.log('📋 Total notices:', notices.length);
+    console.log('📋 All notices:', notices);
+
     // 1. 모든 모달 타입 공지 수집
     modalNotices = notices.filter(n => n.type === 'modal');
+    console.log('🔔 Modal notices found:', modalNotices.length, modalNotices);
+
     if (modalNotices.length > 0) {
         // 쿠키 확인해서 안 본 모달만 필터링
         const unviewedModals = modalNotices.filter(notice => {
             const cookieName = `alertModal_${notice.id}_closed`;
-            return !document.cookie.includes(`${cookieName}=true`);
+            const isClosed = document.cookie.includes(`${cookieName}=true`);
+            console.log(`  - Notice #${notice.id} (${notice.title}): ${isClosed ? '이미 닫음' : '표시 대상'}`);
+            return !isClosed;
         });
+
+        console.log('✅ Unviewed modals:', unviewedModals.length);
 
         if (unviewedModals.length > 0) {
             modalNotices = unviewedModals;
             currentModalIndex = 0;
+            console.log('🚀 Showing modal carousel...');
             showModalCarousel();
+        } else {
+            console.log('⏭️ All modals already viewed');
         }
+    } else {
+        console.log('❌ No modal type notices found');
     }
 
     // 2. 모든 배너 타입 공지 수집
