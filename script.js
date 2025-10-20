@@ -1,3 +1,7 @@
+// Version
+const APP_VERSION = '1.0.0';
+console.log(`APEC Notice Board v${APP_VERSION}`);
+
 // Google Sheets configuration
 const SHEET_ID = '1eNbtOWkGkxssPvnwQmcojzM4vz8EbRTG68YGasMd70A';
 const API_KEY = 'AIzaSyBsDCggkg91Cw8xr-8ryN-HLFhj_m34oeg';
