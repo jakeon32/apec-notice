@@ -13,6 +13,11 @@ let bannerNotices = []; // 모든 배너 공지
 let currentModalIndex = 0; // 현재 모달 인덱스
 let currentBannerIndex = 0; // 현재 배너 인덱스
 
+// 자동 스크롤 관련 변수
+let modalAutoScrollTimer = null;
+let bannerAutoScrollTimer = null;
+const AUTO_SCROLL_INTERVAL = 5000; // 5초마다 자동 전환
+
 // LocalStorage keys
 const READ_NOTICES_KEY = 'readNotices';
 
@@ -165,6 +170,7 @@ function showAlertModal() {
 }
 
 function closeAlertModal() {
+    stopModalAutoScroll();
     document.getElementById('alertModalOverlay').classList.remove('active');
     document.getElementById('alertModal').classList.remove('active');
     document.body.style.overflow = '';
@@ -242,6 +248,8 @@ function showModalCarousel() {
     // 모달 표시
     setTimeout(() => {
         showAlertModal();
+        // 모달이 2개 이상이면 자동 스크롤 시작
+        startModalAutoScroll();
     }, 500);
 }
 
@@ -277,6 +285,9 @@ function navigateModal(direction) {
     if (newIndex >= 0 && newIndex < modalNotices.length) {
         const wrapper = document.getElementById('modalContentWrapper');
 
+        // 수동 조작 시 자동 스크롤 재시작
+        stopModalAutoScroll();
+
         // 슬라이드 아웃 애니메이션
         wrapper.classList.add(direction > 0 ? 'slide-left' : 'slide-right');
 
@@ -300,6 +311,9 @@ function navigateModal(direction) {
             requestAnimationFrame(() => {
                 wrapper.classList.remove('slide-left', 'slide-right');
             });
+
+            // 자동 스크롤 재시작
+            startModalAutoScroll();
         }, 150);
     }
 }
@@ -312,7 +326,42 @@ function closeCurrentModal() {
     expiryDate.setTime(expiryDate.getTime() + (24 * 60 * 60 * 1000));
     document.cookie = `${cookieName}=true; expires=${expiryDate.toUTCString()}; path=/`;
 
+    stopModalAutoScroll();
     closeAlertModal();
+}
+
+// 모달 자동 스크롤 시작
+function startModalAutoScroll() {
+    stopModalAutoScroll(); // 기존 타이머 제거
+
+    // 모달이 2개 이상일 때만 자동 스크롤
+    if (modalNotices.length > 1) {
+        modalAutoScrollTimer = setInterval(() => {
+            const nextIndex = (currentModalIndex + 1) % modalNotices.length;
+            if (nextIndex === 0) {
+                // 마지막에서 처음으로 갈 때
+                navigateModal(1); // 애니메이션은 다음으로
+                setTimeout(() => {
+                    currentModalIndex = 0;
+                    const notice = modalNotices[0];
+                    document.getElementById('alertModal').querySelector('.alert-modal-title').textContent = notice.title;
+                    document.getElementById('alertModal').querySelector('.alert-modal-subtitle').textContent = notice.date;
+                    document.getElementById('alertModal').querySelector('.alert-modal-body').innerHTML = notice.content;
+                    updateModalIndicator();
+                }, 150);
+            } else {
+                navigateModal(1);
+            }
+        }, AUTO_SCROLL_INTERVAL);
+    }
+}
+
+// 모달 자동 스크롤 중지
+function stopModalAutoScroll() {
+    if (modalAutoScrollTimer) {
+        clearInterval(modalAutoScrollTimer);
+        modalAutoScrollTimer = null;
+    }
 }
 
 // Show banner carousel
@@ -361,6 +410,9 @@ function showBannerCarousel() {
 
     // 첫/마지막 버튼 비활성화
     updateBannerButtons();
+
+    // 배너가 2개 이상이면 자동 스크롤 시작
+    startBannerAutoScroll();
 }
 
 // Update banner navigation buttons
@@ -381,6 +433,9 @@ function navigateBanner(direction) {
     const newIndex = currentBannerIndex + direction;
     if (newIndex >= 0 && newIndex < bannerNotices.length) {
         const banner = document.getElementById('dynamicBanner');
+
+        // 수동 조작 시 자동 스크롤 재시작
+        stopBannerAutoScroll();
 
         // 슬라이드 애니메이션
         banner.style.transition = 'transform 0.3s ease, opacity 0.2s';
@@ -421,8 +476,52 @@ function closeBanner(event) {
     expiryDate.setTime(expiryDate.getTime() + (24 * 60 * 60 * 1000));
     document.cookie = `${cookieName}=true; expires=${expiryDate.toUTCString()}; path=/`;
 
+    stopBannerAutoScroll();
     const banner = document.getElementById('dynamicBanner');
     banner.classList.remove('active');
+}
+
+// 배너 자동 스크롤 시작
+function startBannerAutoScroll() {
+    stopBannerAutoScroll(); // 기존 타이머 제거
+
+    // 배너가 2개 이상일 때만 자동 스크롤
+    if (bannerNotices.length > 1) {
+        bannerAutoScrollTimer = setInterval(() => {
+            const nextIndex = (currentBannerIndex + 1) % bannerNotices.length;
+            const banner = document.getElementById('dynamicBanner');
+
+            if (!banner) {
+                stopBannerAutoScroll();
+                return;
+            }
+
+            // 슬라이드 애니메이션
+            banner.style.transition = 'transform 0.3s ease, opacity 0.2s';
+            banner.style.transform = 'translateX(-20px)';
+            banner.style.opacity = '0.5';
+
+            setTimeout(() => {
+                currentBannerIndex = nextIndex;
+                showBannerCarousel();
+
+                banner.style.transform = 'translateX(20px)';
+
+                requestAnimationFrame(() => {
+                    banner.style.transform = 'translateX(0)';
+                    banner.style.opacity = '1';
+                });
+            }, 150);
+        }, AUTO_SCROLL_INTERVAL);
+    }
+}
+
+// 배너 자동 스크롤 중지
+function stopBannerAutoScroll() {
+    if (bannerAutoScrollTimer) {
+        clearInterval(bannerAutoScrollTimer);
+        bannerAutoScrollTimer = null;
+    }
 }
 
 // Touch swipe support for modal
