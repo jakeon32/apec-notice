@@ -18,6 +18,10 @@ let modalAutoScrollTimer = null;
 let bannerAutoScrollTimer = null;
 const AUTO_SCROLL_INTERVAL = 5000; // 5초마다 자동 전환
 
+// 모달 스크롤 상태 관련 변수
+let isUserScrolling = false;
+let scrollTimeout = null;
+
 // LocalStorage keys
 const READ_NOTICES_KEY = 'readNotices';
 
@@ -337,6 +341,11 @@ function startModalAutoScroll() {
     // 모달이 2개 이상일 때만 자동 스크롤
     if (modalNotices.length > 1) {
         modalAutoScrollTimer = setInterval(() => {
+            // 사용자가 스크롤 중이면 자동 스크롤 건너뛰기
+            if (isUserScrolling) {
+                return;
+            }
+
             const nextIndex = (currentModalIndex + 1) % modalNotices.length;
             if (nextIndex === 0) {
                 // 마지막에서 처음으로 갈 때
@@ -477,8 +486,22 @@ function closeBanner(event) {
     document.cookie = `${cookieName}=true; expires=${expiryDate.toUTCString()}; path=/`;
 
     stopBannerAutoScroll();
-    const banner = document.getElementById('dynamicBanner');
-    banner.classList.remove('active');
+
+    // 현재 배너를 배열에서 제거
+    bannerNotices.splice(currentBannerIndex, 1);
+
+    // 남은 배너가 있으면 다음 배너 표시
+    if (bannerNotices.length > 0) {
+        // 인덱스 조정 (마지막 배너를 닫았을 경우)
+        if (currentBannerIndex >= bannerNotices.length) {
+            currentBannerIndex = bannerNotices.length - 1;
+        }
+        showBannerCarousel();
+    } else {
+        // 모든 배너가 닫혔으면 배너 숨김
+        const banner = document.getElementById('dynamicBanner');
+        banner.classList.remove('active');
+    }
 }
 
 // 배너 자동 스크롤 시작
@@ -562,6 +585,22 @@ function handleBannerSwipe() {
     }
 }
 
+// Handle user scrolling in modal body
+function handleModalBodyScroll() {
+    // 사용자가 스크롤을 시작하면
+    isUserScrolling = true;
+
+    // 이전 타임아웃 제거
+    if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+    }
+
+    // 2초 동안 스크롤이 없으면 자동 스크롤 재개
+    scrollTimeout = setTimeout(() => {
+        isUserScrolling = false;
+    }, 2000);
+}
+
 // Check cookie and show modal on load
 window.addEventListener('load', () => {
     // Load notices from Google Sheets
@@ -577,6 +616,12 @@ window.addEventListener('load', () => {
         modalTouchEndX = e.changedTouches[0].screenX;
         handleModalSwipe();
     }, { passive: true });
+
+    // Add scroll listener to modal body
+    const modalBody = document.querySelector('.alert-modal-body');
+    if (modalBody) {
+        modalBody.addEventListener('scroll', handleModalBodyScroll, { passive: true });
+    }
 });
 
 // Close panel on ESC key
